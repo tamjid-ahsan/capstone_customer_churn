@@ -1,35 +1,26 @@
-import plotly.express as px
-from datetime import datetime
-import seaborn as sns
-import joblib
-import matplotlib as mpl
-import matplotlib.pyplot as plt
-import numpy as np
-import random
-import pmdarima as pm
-import statsmodels.tsa.api as tsa
+import warnings
+from IPython.display import display, HTML, Markdown
+from sklearn.preprocessing import OrdinalEncoder
+from sklearn.svm import SVC
+from xgboost import XGBClassifier, XGBRFClassifier
+from sklearn.model_selection import GridSearchCV
+from imblearn.over_sampling import SMOTENC
+from sklearn.preprocessing import LabelEncoder
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.compose import ColumnTransformer
+from sklearn.inspection import permutation_importance
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import OneHotEncoder, MinMaxScaler, StandardScaler
+from sklearn import metrics
+from sklearn.dummy import DummyClassifier
+from sklearn.model_selection import train_test_split
 import pandas as pd
-pd.set_option('display.max_columns', 0)
-from ipywidgets import interact
-
+import matplotlib.pyplot as plt
+from jupyterthemes import jtplot
+jtplot.style(theme='monokai', context='notebook', ticks='True', grid='False')
 # from jupyterthemes import jtplot
-# # OG plot
 # jtplot.reset()
-# # jtplot.style(theme='monokai', context='notebook', ticks='True', grid='False')
 # plt.style.use('ggplot')
-
-# # https://matplotlib.org/stable/tutorials/introductory/customizing.html
-# font = {'weight': 'normal', 'size': 8}
-# text = {'color': 'white'}
-# axes = {'labelcolor': 'white'}
-# xtick = {'color': 'white'}
-# ytick = {'color': 'white'}
-# legend = {'facecolor': 'black', 'framealpha': 0.6}
-
-# # mpl.rcParams['figure.facecolor'] = '#232323' # matplotlib over-writes this
-# mpl.rc('legend', **legend)
-# mpl.rc('text', **text)
-# mpl.rc('xtick', **xtick)
-# mpl.rc('ytick', **ytick)
-# mpl.rc('axes', **axes)
-# mpl.rc('font', **font)
+from sklearn.cluster import KMeans
+import plotly.express as px
+from ipywidgets import interact
