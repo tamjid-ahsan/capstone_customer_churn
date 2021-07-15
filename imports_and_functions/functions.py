@@ -8,6 +8,8 @@ from sklearn.preprocessing import OneHotEncoder, MinMaxScaler, StandardScaler
 from sklearn.compose import ColumnTransformer
 from yellowbrick.classifier.rocauc import roc_auc
 import seaborn as sns
+import numpy as np
+import plotly.express as px
 
 # functions
 
@@ -185,7 +187,8 @@ def show_py_file_content(file='./imports_and_functions/functions.py'):
     """
     with open(file, 'r', encoding="utf8") as f:
         x = f"""```python
-{f.read()}```"""
+{f.read()}
+```"""
         display(Markdown(x))
 
 
@@ -341,3 +344,144 @@ def plot_distribution(df,
         plt.suptitle(plot_title, fontsize=20, fontweight=3, va='bottom')
     plt.show()
     pass
+
+
+def heatmap_of_features(df, figsize=(15, 15), annot_format='.1f'):
+    """
+    Return a masked heatmap of the given DataFrame
+
+    Parameters:
+    ===========
+    df            = pandas.DataFrame object.
+    annot_format  = str, for formatting; default: '.1f'
+
+    Example of `annot_format`:
+    --------------------------
+    .1e = scientific notation with 1 decimal point (standard form)
+    .2f = 2 decimal places
+    .3g = 3 significant figures
+    .4% = percentage with 4 decimal places
+
+    Note:
+    =====
+    Rounding error can happen if '.1f' is used.
+
+    -- version: 1.1 --
+    """
+    with plt.style.context('dark_background'):
+        plt.figure(figsize=figsize, facecolor='k')
+        mask = np.triu(np.ones_like(df.corr(), dtype=bool))
+        cmap = sns.diverging_palette(3, 3, as_cmap=True)
+        ax = sns.heatmap(df.corr(),
+                         mask=mask,
+                         cmap=cmap,
+                         annot=True,
+                         fmt=annot_format,
+                         linecolor='k',
+                         annot_kws={"size": 9},
+                         square=False,
+                         linewidths=.5,
+                         cbar_kws={"shrink": .5})
+        plt.title(f'Features heatmap', fontdict={"size": 20})
+        plt.show()
+        return ax
+
+
+def drop_features_based_on_correlation(df, threshold=0.75):
+    """
+    Returns features with high collinearity.
+
+    Parameters:
+    ===========
+    df = pandas.DataFrame; no default.
+            data to work on.
+    threshold = float; default: .75.
+            Cut off value of check of collinearity.
+
+    -- ver: 1.0 --
+    """
+    # Set of all the names of correlated columns
+    feature_corr = set()
+    corr_matrix = df.corr()
+    for i in range(len(corr_matrix.columns)):
+        for j in range(i):
+            # absolute coeff value
+            if abs(corr_matrix.iloc[i, j]) > threshold:
+                # getting the name of column
+                colname = corr_matrix.columns[i]
+                feature_corr.add(colname)
+    return feature_corr
+
+
+def cluster_insights(df):
+    # fig 1 Age
+    financials = [
+        'Months_on_book', 'Total_Relationship_Count', 'Months_Inactive_12_mon',
+        'Contacts_Count_12_mon', 'Credit_Limit', 'Total_Revolving_Bal',
+        'Avg_Open_To_Buy', 'Total_Amt_Chng_Q4_Q1', 'Total_Trans_Amt',
+        'Total_Trans_Ct', 'Total_Ct_Chng_Q4_Q1', 'Avg_Utilization_Ratio'
+    ]
+    fig = px.histogram(df,
+                       x='Customer_Age',
+                       marginal="box",
+                       template='presentation',
+                       nbins=10,
+                       color='Gender',
+                       barmode='group',
+                       title='Customer Demographics',
+                       hover_data=df)
+    fig.update_traces(opacity=0.8)
+    fig.update_layout(bargap=0.05)
+    fig.show()
+    # fig 2 Education
+    fig = px.histogram(df,
+                       color='Education_Level',
+                       marginal="box",
+                       template='presentation',
+                       category_orders=dict(Income_Category=[
+                           'Unknown', 'Less_than_40K', '40K_to_60K',
+                           '60K_to_80K', '80K_to_120K', 'Above_120K'
+                       ]),
+                       title='Education Level & Income Category',
+                       x='Income_Category',
+                       barmode='group',
+                       hover_data=df)
+    # fig.update_layout(width=700, height=500, bargap=0.05)
+    fig.show()
+    # fig 4 dependent count
+    fig = px.histogram(df,
+                       x='Dependent_count',
+                       marginal="box",
+                       template='presentation',
+                       title='Marital Status & Dependent count',
+                       color='Marital_Status',
+                       barmode='group',
+                       hover_data=df)
+    fig.update_traces(opacity=0.8)
+    fig.update_layout(width=700, height=500, bargap=0.05)
+    fig.show()
+    # fig 5 Card category
+    fig = px.bar(x='Card_Category',
+                 color='Card_Category',
+                 data_frame=df,
+                 template='presentation',
+                 title='Card Category',
+                 color_discrete_sequence=["blue", "gold", "silver", "#c1beba"])
+    fig.update_layout(width=700, height=500, bargap=0.05)
+    fig.show()
+    # fig 6
+    plot_distribution(df[financials], color='silver', figsize=(
+        16, 16), plot_title='Histogram of Numreical features')
+    plt.show()
+    pass
+
+def describe_dataframe(df):
+    left = df.describe(include='all').round(2).T
+    right = pd.DataFrame(df.dtypes)
+    right.columns = ['dtype']
+    ret_df = pd.merge(left=left, right=right, left_index=True, right_index=True)
+    na_df = pd.DataFrame(df.isna().sum())
+    na_df.columns = ['nulls']
+    ret_df = pd.merge(left=ret_df, right=na_df, left_index=True, right_index=True)
+    ret_df.fillna('', inplace=True)
+    return ret_df
