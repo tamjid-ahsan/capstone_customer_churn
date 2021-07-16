@@ -27,6 +27,8 @@ def model_report(model,
                  figsize=(15, 5)):
     """
     Dispalys model report.
+
+
     """
     if fitted_model is False:
         model.fit(X_train, y_train)
@@ -124,6 +126,9 @@ def model_report(model,
 
 
 def dataset_processor_segmentation(X, OHE_drop_option=None, verbose=0, scaler=None):
+    """
+
+    """
     # isolating numerical cols
     nume_col = list(X.select_dtypes('number').columns)
     if verbose > 0:
@@ -414,6 +419,9 @@ def drop_features_based_on_correlation(df, threshold=0.75):
 
 
 def cluster_insights(df):
+    """
+
+    """
     # fig 1 Age
     financials = [
         'Months_on_book', 'Total_Relationship_Count', 'Months_Inactive_12_mon',
@@ -475,13 +483,71 @@ def cluster_insights(df):
     plt.show()
     pass
 
+
 def describe_dataframe(df):
+    """
+
+    """
     left = df.describe(include='all').round(2).T
     right = pd.DataFrame(df.dtypes)
     right.columns = ['dtype']
-    ret_df = pd.merge(left=left, right=right, left_index=True, right_index=True)
+    ret_df = pd.merge(left=left, right=right,
+                      left_index=True, right_index=True)
     na_df = pd.DataFrame(df.isna().sum())
     na_df.columns = ['nulls']
-    ret_df = pd.merge(left=ret_df, right=na_df, left_index=True, right_index=True)
+    ret_df = pd.merge(left=ret_df, right=na_df,
+                      left_index=True, right_index=True)
     ret_df.fillna('', inplace=True)
     return ret_df
+
+
+def check_duplicates(df, verbose=0, limit_output=True, limit_num=150):
+    """
+    Checks for duplicates in the pandas DataFrame and return a Dataframe of report.
+
+    Parameters:
+    ===========
+    df = pandas.DataFrame
+    verbose = `int` or `boolean`; default: `False`
+    limit_output = `int` or `boolean`; default: `True`
+                `True` limits featurs display to 150.
+                `False` details of unique features.
+    limit_num = `int`, limit number of uniques; default: 150,
+
+    Returns:
+    ========
+    pandas.DataFrame, if verbose = 1.
+
+    ---version 1.3---
+    """
+    dup_checking = []
+    for column in df.columns:
+        not_duplicated = df[column].duplicated().value_counts()[0]
+        try:
+            duplicated = df[column].duplicated().value_counts()[1]
+        except:
+            duplicated = 0
+        temp_dict = {
+            'name': column,
+            'duplicated': duplicated,
+            'not_duplicated': not_duplicated
+        }
+        dup_checking.append(temp_dict)
+    df_ = pd.DataFrame(dup_checking)
+
+    if verbose > 0:
+        if limit_output:
+            for col in df:
+                if (len(df[col].unique())) <= limit_num:
+                    print(
+                        f"{col} >> number of uniques: {len(df[col].unique())}\nValues:\n{df[col].unique()}")
+                else:
+                    print(
+                        f"{col} >> number of uniques: {len(df[col].unique())}, showing top {limit_num} values\nTop {limit_num} Values:\n{df[col].unique()[:limit_num]}\n")
+                print(f"{'_'*60}\n")
+        else:
+            for col in df:
+                print(
+                    f"{col} >> number of uniques: {len(df[col].unique())}\nValues:\n{df[col].unique()}")
+    if 1 > verbose >= 0:
+        return df_
