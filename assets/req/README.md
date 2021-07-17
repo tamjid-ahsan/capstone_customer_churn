@@ -1,10 +1,10 @@
 # Dependancy management
 
-Use following files to recreate this env
+Use following files to recreate env used for this analysis.
 
 Files description:
 ```
-├── README.md                                               # Readme and instruction
+├── README.md                                               # Readme and instructions
 ├── env                                                     # env .yml files
 │   ├── learn-env-win.yml                                   # for use with windows os
 │   └── learn-env.yml                                       # os agnostic
@@ -12,7 +12,13 @@ Files description:
     ├── requirements_conda.txt                              # use with conda
     └── requirements_pip.txt                                # use with pip
 ```
-NOTE: text inside <> refers to respective names
+NOTE: 
+
+[1] Text inside <> refers to respective names
+
+[2] cd to this folder can be helpful
+
+[3] This analysis is performed on a Windows 10 Pro machine, WSL2 (Windwos Subsystem for Linux version 2) terminal of Ubuntu-20.04 Virtual Machine, git-bash, and Microsoft Visual Studio Code.
 ___
 
 # Installing requirements
@@ -48,11 +54,11 @@ create .yml
 conda env list
 # activate env first
 conda activate <env>
-conda env export > <env>.yml --no-builds 
+conda env export > <env>.yml --no-builds # os agnostic
 ```
 OR
 ```python
-conda env export > learn-env-new.yml
+conda env export > <env>.yml # os specific
 ```
 Useful command:
 ```python
