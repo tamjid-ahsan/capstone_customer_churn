@@ -5,7 +5,7 @@ Use following files to recreate env used for this analysis.
 Files description:
 ```
 ├── README.md                                               # Readme and instructions
-├── env                                                     # env .yml files
+├── env_files                                               # env .yml files
 │   ├── learn-env-win.yml                                   # for use with windows os
 │   └── learn-env.yml                                       # os agnostic
 └── package_and_lib                                         # dependancies of this analysis
