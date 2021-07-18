@@ -418,7 +418,7 @@ def drop_features_based_on_correlation(df, threshold=0.75):
     return feature_corr
 
 
-def cluster_insights(df):
+def cluster_insights(df, color=px.colors.qualitative.Pastel):
     """
 
     """
@@ -435,7 +435,7 @@ def cluster_insights(df):
                        template='presentation',
                        nbins=10,
                        color='Gender',
-                       barmode='group',
+                       barmode='group', color_discrete_sequence=color,
                        title='Customer Demographics',
                        hover_data=df)
     fig.update_traces(opacity=0.8)
@@ -445,7 +445,7 @@ def cluster_insights(df):
     fig = px.histogram(df,
                        color='Education_Level',
                        marginal="box",
-                       template='presentation',
+                       template='presentation', color_discrete_sequence=color,
                        category_orders=dict(Income_Category=[
                            'Unknown', 'Less_than_40K', '40K_to_60K',
                            '60K_to_80K', '80K_to_120K', 'Above_120K'
@@ -460,7 +460,7 @@ def cluster_insights(df):
     fig = px.histogram(df,
                        x='Dependent_count',
                        marginal="box",
-                       template='presentation',
+                       template='presentation', color_discrete_sequence=color,
                        title='Marital Status & Dependent count',
                        color='Marital_Status',
                        barmode='group',
@@ -551,3 +551,158 @@ def check_duplicates(df, verbose=0, limit_output=True, limit_num=150):
                     f"{col} >> number of uniques: {len(df[col].unique())}\nValues:\n{df[col].unique()}")
     if 1 > verbose >= 0:
         return df_
+
+
+def unseen_data_processor(X, preprocessor, nume_col, cate_col):
+    ret_df = pd.DataFrame(preprocessor.transform(X),
+                          columns=nume_col +
+                          list(preprocessor.named_transformers_['cate_feat'].
+                               named_steps['ohe'].get_feature_names(cate_col)))
+    return ret_df
+
+
+def show_px_color_options(type='qualitative'):
+    if type == 'qualitative':
+        display(dir(px.colors.qualitative))
+    elif type == 'sequential':
+        display(dir(px.colors.sequential))
+    pass
+
+
+def dataset_processor(X, y, train_size=.8, scaler=None,  OHE_drop_option=None, oversample=True, random_state=None, verbose=0, output='default'):
+    """All data processing steps in one. Train test split, scale, OHE, Oversample."""
+    from sklearn.model_selection import train_test_split
+    # isolating numerical cols
+    nume_col = list(X.select_dtypes('number').columns)
+    if verbose > 0:
+        print("Numerical columns: \n---------------------\n", nume_col)
+
+    # isolating categorical cols
+    cate_col = list(X.select_dtypes('object').columns)
+    if verbose > 0:
+        print('')
+        print("Categorical columns: \n---------------------\n", cate_col)
+    # train_test_split
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, train_size=train_size, random_state=random_state)
+
+    # pipeline for processing categorical features
+    pipe_cate = Pipeline([('ohe',
+                           OneHotEncoder(sparse=False, drop=OHE_drop_option))])
+    # pipeline for processing numerical features
+    if scaler is None:
+        scaler = StandardScaler()
+    pipe_nume = Pipeline([('scaler', scaler)])
+    # transformer
+    preprocessor = ColumnTransformer([('nume_feat', pipe_nume, nume_col),
+                                      ('cate_feat', pipe_cate, cate_col)])
+    # creating dataframes
+    try:
+        X_train = pd.DataFrame(
+            preprocessor.fit_transform(X_train),
+            columns=nume_col +
+            list(preprocessor.named_transformers_['cate_feat'].
+                 named_steps['ohe'].get_feature_names(cate_col)))
+        X_test = pd.DataFrame(
+            preprocessor.transform(X_test),
+            columns=nume_col +
+            list(preprocessor.named_transformers_['cate_feat'].
+                 named_steps['ohe'].get_feature_names(cate_col)))
+        if verbose > 2:
+            print("\n\n------")
+            print(
+                f"Scaler: {str(preprocessor.named_transformers_['nume_feat'].named_steps['scaler'].__class__)[1:-2].split('.')[-1]}, settings: {preprocessor.named_transformers_['nume_feat'].named_steps['scaler'].get_params()}"
+            )
+            print(
+                f"Encoder: {str(preprocessor.named_transformers_['cate_feat'].named_steps['ohe'].__class__)[1:-2].split('.')[-1]}, settings: {preprocessor.named_transformers_['cate_feat'].named_steps['ohe'].get_params()}"
+            )
+            print("------")
+    except:
+        # if no categorical cols found
+        if verbose > 2:
+            print("\n\n------")
+            print(
+                f"Scaler: {str(preprocessor.named_transformers_['nume_feat'].named_steps['scaler'].__class__)[1:-2].split('.')[-1]}, settings: {preprocessor.named_transformers_['nume_feat'].named_steps['scaler'].get_params()}"
+            )
+            print(
+                f"Encoder: {str(preprocessor.named_transformers_['cate_feat'].named_steps['ohe'].__class__)[1:-2].split('.')[-1]}, settings: {preprocessor.named_transformers_['cate_feat'].named_steps['ohe'].get_params()}"
+            )
+            print("------")
+        print("No Categorical columns found")
+        X_train = pd.DataFrame(
+            preprocessor.fit_transform(X_train), columns=nume_col)
+        X_test = pd.DataFrame(preprocessor.transform(X_test), columns=nume_col)
+    if oversample:
+        from imblearn.over_sampling import SMOTENC
+        if verbose > 1:
+            print("\n----------------------")
+            print("oversampled train data")
+            print("----------------------")
+        smotenc_features = [
+            False] * len(nume_col) + [True] * (len(X_train.columns) - len(nume_col))
+        if verbose > 3:
+            print(
+                f'debug mode: oversampling, based on X_train, check dtype of oversampled data')
+            print(f'smotenc_features: {smotenc_features}')
+        oversampling = SMOTENC(
+            categorical_features=smotenc_features, random_state=random_state, n_jobs=-1)
+        X_train, y_train = oversampling.fit_sample(X_train, y_train)
+
+    if output == 'default':
+        return X_train, y_train, X_test, y_test
+    elif output == 'all':
+        return X_train, y_train, X_test, y_test, preprocessor
+
+
+def feature_analysis_intracluster(
+        x,
+        facet_col,
+        n_clusters, data_frame=None,
+        title=None,
+        nbins=None,
+        marginal='box',
+        histnorm='probability density',
+        color_discrete_sequence=px.colors.qualitative.Pastel,
+        template='presentation'):
+    if title is None:
+        if data_frame is None:
+            title = f'{x.name.replace("_"," ")}'
+        else:
+            title = f'{data_frame[x].name.replace("_"," ")}'
+    fig = px.histogram(
+        data_frame=data_frame,
+        x=x,
+        facet_col=facet_col,
+        marginal=marginal,
+        histnorm=histnorm,
+        nbins=nbins,
+        color_discrete_sequence=color_discrete_sequence,
+        template=template,
+        title=title,
+        facet_col_spacing=0.005,
+        category_orders={'Clusters': list(np.arange(0, n_clusters))})
+    fig.update_xaxes(showline=True,
+                     linewidth=1,
+                     linecolor=color_discrete_sequence[0],
+                     mirror=True,
+                     title={'text': ''})
+    fig.update_yaxes(showline=True,
+                     linewidth=1,
+                     linecolor=color_discrete_sequence[0],
+                     mirror=True)
+    fig.for_each_annotation(
+        lambda a: a.update(text=f'Cluster: {a.text.split("=")[1]}'))
+    return fig
+
+
+def get_variable_name(*args):
+    """ modified from: https://stackoverflow.com/questions/32000934/python-print-a-variables-name-and-value """
+    import inspect
+    import re
+    frame = inspect.currentframe().f_back
+    s = inspect.getframeinfo(frame).code_context[0]
+    r = re.search(r"\((.*)\)", s).group(1)
+    vnames = r.split(", ")
+    for i, (var, val) in enumerate(zip(vnames, args)):
+        x = f"{var}"
+        return x

@@ -18,9 +18,40 @@ NOTE:
 
 [2] cd to this folder can be helpful
 
-[3] This analysis is performed on a Windows 10 Pro machine, WSL2 (Windwos Subsystem for Linux version 2) terminal of Ubuntu-20.04 Virtual Machine, git-bash, and Microsoft Visual Studio Code.
+[3] This is tested on a Windows 10 Pro machine using WSL2 (Windwos Subsystem for Linux version 2) terminal of Ubuntu-20.04 Virtual Machine, git-bash version 2.30.0.windows.1, and Microsoft Visual Studio Code version 1.58.2.
+___
 ___
 
+# Steps:
+- get a local copy of this repo via git, options are:
+    - clone this repo locally
+    - fork this repo locally 
+    - get zipped version of repo and extract locally
+- open terminal in the appropriate folder, env_files OR package_and_lib
+- If using a fresh conda env:
+    - open terminal in ```env_files``` folder
+    - use appropriate .yml. e.g., ```learn-env.yml```
+    
+        ```conda env create -f learn-env.yml```
+    - add kernel: replace ```<text>s```
+        - ```python -m ipykernel install --user --name <env_name> --display-name "<kernel_name>" ```
+    - use the kernel along the new env
+
+- If installing required packages in the existing env
+    - open terminal in ```package_and_lib``` folder
+    - using conda: <env_name> == new env name 
+    
+        ```conda create --name <env_name> --file requirements_conda.txt```
+    - using pip:
+
+        ```pip install -r requirements_pip.txt```
+
+<br>
+
+___
+___
+
+# Some Useful commands
 # Installing requirements
 
 If using pip:
@@ -88,3 +119,10 @@ Remove kernel
 ```python
 jupyter kernelspec remove <kernel_name>
 ```
+
+___
+___
+
+DISCLAIMER: 
+
+Author does not take any responsibilty if you manage to break your env setup. But if that bad luck ever bestow upon you, dont feel hesitant to contact.
