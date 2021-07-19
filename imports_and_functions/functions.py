@@ -1,5 +1,8 @@
 # imports
+import plotly.graph_objs as go
 import matplotlib.pyplot as plt
+# import plotly
+# from plotly import graph_objs
 from sklearn import metrics
 from IPython.display import display, HTML, Markdown
 import pandas as pd
@@ -26,9 +29,35 @@ def model_report(model,
                  normalize='true',
                  figsize=(15, 5)):
     """
-    Dispalys model report.
+    Dispalys classification model report.
+    Report of model performance using train-test split dataset.
+    Shows train and test score, Confusion Matrix and, ROC Curve of performane of test data.
+    Uses sklearn for plotting.
+    
+    Intended to work ONLY on model where target has properly encoded binomial class value.
+    
+    Parameters:
+    -----------
+    model : object, scikit-learn model object; no default.
+    X_train : pandas.DataFrame, predictor variable training data split; no default,
+    y_train : pandas.DataFrame, target variable training data split; no default,
+    X_test : pandas.DataFrame, predictor variable test data split; no default,
+    y_test : pandas.DataFrame, target variable test data split; no default,
+    cmap : {NOT IMPLIMENTED} list of str, colormap of Confusion Matrix; default: ['cool', 'copper_r'],
+        cmap of train and test data
+    normalize : {NOT IMPLIMENTED} str, normalize count of Confusion Matrix; default: 'true',
+        - `true` to normalize counts.
+        - `false` to show raw counts.
+    figsize : tuple ``(lenght, height) in inchs``, figsize of output; default: (16, 6),
+    show_train_report : boolean; default: False,
+        - True, to show report.
+        - False, to turn off report.
+    fitted_model : bool; default: False,
+        - if True, fits model to train data and generates report.
+        - if False, does not fits model and generates report.
+        Use False for previously fitted model.
 
-
+    ---version 0.9.14---
     """
     if fitted_model is False:
         model.fit(X_train, y_train)
@@ -126,8 +155,45 @@ def model_report(model,
 
 
 def dataset_processor_segmentation(X, OHE_drop_option=None, verbose=0, scaler=None):
-    """
+    """Prepares data for use in Kmeans clustering algorithm.
+    
+    +++++++++++++++++++++
+     predefined function
+    +++++++++++++++++++++
+    
+    Parameters:
+    -----------
+    X : pandas.core.frame.DataFrame; no defalut, independent variables, 
+    scaler : sklearn.preprocessing; default = None,
+        None uses ```StandardScaler```
+    OHE_drop_option : str; default = None,
+        for use in sklearn.preprocessing._encoders.OneHotEncoder
+        drop : {'first', 'if_binary'} or a array-like of shape (n_features,),             
+        default=None, Specifies a methodology to use to drop one of the 
+        categories per feature. This is useful in situations where perfectly 
+        collinear features cause problems, such as when feeding the resulting 
+        data into a neural network or an unregularized regression.
 
+        However, dropping one category breaks the symmetry of the original
+        representation and can therefore induce a bias in downstream models,
+        for instance for penalized linear classification or regression models.
+
+            - None : retain all features (the default).
+            - 'first' : drop the first category in each feature. If only one
+            category is present, the feature will be dropped entirely.
+            - 'if_binary' : drop the first category in each feature with two
+            categories. Features with 1 or more than 2 categories are
+            left intact.
+            - array : ``drop[i]`` is the category in feature ``X[:, i]`` that
+            should be dropped.
+    verbose : int; default = 0, 
+        verbosity control. Larger value means more report. 
+    
+    Returns:
+    --------
+    X  : pandas.core.frame.DataFrame, 
+    
+    --- version 0.1 ---
     """
     # isolating numerical cols
     nume_col = list(X.select_dtypes('number').columns)
@@ -187,8 +253,8 @@ def show_py_file_content(file='./imports_and_functions/functions.py'):
 
     Parameter:
     ==========
-    file = `str`; default: './imports_and_functions/functions.py',
-                path to the py file.
+    file : `str`; default: './imports_and_functions/functions.py',
+        path to the py file.
     """
     with open(file, 'r', encoding="utf8") as f:
         x = f"""```python
@@ -209,7 +275,33 @@ def model_report_multiclass(model,
                             normalize='true',
                             figsize=(15, 5)):
     """
-    Dispalys model report.
+    Dispalys model report of multiclass classification model.
+    Report of model performance using train-test split dataset.
+    Shows train and test score, Confusion Matrix and, ROC Curve of performane of test data. 
+    Uses sklearn and yellowbrick for plotting.
+    
+    Parameters:
+    -----------
+    model : object, scikit-learn model object; no default.
+    X_train : pandas.DataFrame, predictor variable training data split; no default,
+    y_train : pandas.DataFrame, target variable training data split; no default,
+    X_test : pandas.DataFrame, predictor variable test data split; no default,
+    y_test : pandas.DataFrame, target variable test data split; no default,
+    cmap : {NOT IMPLIMENTED} list of str, colormap of Confusion Matrix; default: ['cool', 'copper_r'],
+        cmap of train and test data
+    normalize : {NOT IMPLIMENTED} str, normalize count of Confusion Matrix; default: 'true',
+        - `true` to normalize counts.
+        - `false` to show raw counts.
+    figsize : tuple ``(lenght, height) in inchs``, figsize of output; default: (16, 6),
+    show_train_report : boolean; default: False,
+        - True, to show report.
+        - False, to turn off report.
+    fitted_model : bool; default: False,
+        - if True, fits model to train data and generates report.
+        - if False, does not fits model and generates report.
+        Use False for previously fitted model.
+
+    ---version 0.9.14---
     """
     if fitted_model is False:
         model.fit(X_train, y_train)
@@ -319,6 +411,22 @@ def plot_distribution(df,
                       fig_col=3,
                       labelrotation=45,
                       plot_title='Histogram plots of the dataset'):
+    """Plots distribution of features
+    
+    +++++++++++++++++
+     Helper function
+    +++++++++++++++++
+
+    Parameters:
+    -----------
+    df : pandas.DataFrame, predictor variable training data split; no default,
+    color : str, default = 'gold', 
+        color of bars, takes everything that seaborn takes as color option,
+    figsize : tuple ``(lenght, height) in inchs``, figsize of output; default: (16, 26),
+    fig_col : int; defalut = 3, Controls how many colums to plot in one row,
+    labelrotation : int; default = 45, xlabel tick rotation,
+    plot_title : str; default = 'Histogram plots of the dataset',
+    """
     def num_col_for_plotting(row, col=fig_col):
         """
         +++ formatting helper function +++
@@ -356,9 +464,9 @@ def heatmap_of_features(df, figsize=(15, 15), annot_format='.1f'):
     Return a masked heatmap of the given DataFrame
 
     Parameters:
-    ===========
-    df            = pandas.DataFrame object.
-    annot_format  = str, for formatting; default: '.1f'
+    -----------
+    df : pandas.DataFrame object.
+    annot_format : str, for formatting; default: '.1f'
 
     Example of `annot_format`:
     --------------------------
@@ -368,7 +476,7 @@ def heatmap_of_features(df, figsize=(15, 15), annot_format='.1f'):
     .4% = percentage with 4 decimal places
 
     Note:
-    =====
+    -----
     Rounding error can happen if '.1f' is used.
 
     -- version: 1.1 --
@@ -419,8 +527,11 @@ def drop_features_based_on_correlation(df, threshold=0.75):
 
 
 def cluster_insights(df, color=px.colors.qualitative.Pastel):
-    """
-
+    """Plots plotly plots.
+    
+    +++++++++++++++++
+     Helper function
+    +++++++++++++++++
     """
     # fig 1 Age
     financials = [
@@ -450,7 +561,7 @@ def cluster_insights(df, color=px.colors.qualitative.Pastel):
                            'Unknown', 'Less_than_40K', '40K_to_60K',
                            '60K_to_80K', '80K_to_120K', 'Above_120K'
                        ]),
-                       title='Education Level & Income Category',
+                       title='Education Level by Income Category',
                        x='Income_Category',
                        barmode='group',
                        hover_data=df)
@@ -474,7 +585,7 @@ def cluster_insights(df, color=px.colors.qualitative.Pastel):
                  data_frame=df,
                  template='presentation',
                  title='Card Category',
-                 color_discrete_sequence=["blue", "gold", "silver", "#c1beba"])
+                 color_discrete_sequence=["#4169e1", "#fdff00", "#797979", "#e5e5e5"])
     fig.update_layout(width=700, height=500, bargap=0.05)
     fig.show()
     # fig 6
@@ -485,9 +596,7 @@ def cluster_insights(df, color=px.colors.qualitative.Pastel):
 
 
 def describe_dataframe(df):
-    """
-
-    """
+    """Statistical description of the pandas.DataFrame."""
     left = df.describe(include='all').round(2).T
     right = pd.DataFrame(df.dtypes)
     right.columns = ['dtype']
@@ -554,6 +663,11 @@ def check_duplicates(df, verbose=0, limit_output=True, limit_num=150):
 
 
 def unseen_data_processor(X, preprocessor, nume_col, cate_col):
+    """    
+    +++++++++++++++++
+     Helper function
+    +++++++++++++++++ 
+    """
     ret_df = pd.DataFrame(preprocessor.transform(X),
                           columns=nume_col +
                           list(preprocessor.named_transformers_['cate_feat'].
@@ -562,6 +676,7 @@ def unseen_data_processor(X, preprocessor, nume_col, cate_col):
 
 
 def show_px_color_options(type='qualitative'):
+    """Shows available options for plotly express."""
     if type == 'qualitative':
         display(dir(px.colors.qualitative))
     elif type == 'sequential':
@@ -570,7 +685,65 @@ def show_px_color_options(type='qualitative'):
 
 
 def dataset_processor(X, y, train_size=.8, scaler=None,  OHE_drop_option=None, oversample=True, random_state=None, verbose=0, output='default'):
-    """All data processing steps in one. Train test split, scale, OHE, Oversample."""
+    """All data processing steps in one. Train test split, scale, OHE, Oversample.
+
+    Parameters:
+    -----------
+    X : pandas.core.frame.DataFrame; no defalut, independent variables, 
+    y : pandas.core.series.Series, no defalut, dependent variables,
+    train_size : float or int; default = .8, 
+        For use in train_test_split module from sklearn.model_selection 
+        If float, should be between 0.0 and 1.0 and represent the
+        proportion of the dataset to include in the train split. If
+        int, represents the absolute number of train samples. If None,
+        the value is automatically set to the complement of the test size.
+    scaler : sklearn.preprocessing; default = None,
+        None uses ```StandardScaler```
+    OHE_drop_option : str; default = None,
+        for use in sklearn.preprocessing._encoders.OneHotEncoder
+        drop : {'first', 'if_binary'} or a array-like of shape (n_features,),             
+        default=None, Specifies a methodology to use to drop one of the 
+        categories per feature. This is useful in situations where perfectly 
+        collinear features cause problems, such as when feeding the resulting 
+        data into a neural network or an unregularized regression.
+
+        However, dropping one category breaks the symmetry of the original
+        representation and can therefore induce a bias in downstream models,
+        for instance for penalized linear classification or regression models.
+
+            - None : retain all features (the default).
+            - 'first' : drop the first category in each feature. If only one
+            category is present, the feature will be dropped entirely.
+            - 'if_binary' : drop the first category in each feature with two
+            categories. Features with 1 or more than 2 categories are
+            left intact.
+            - array : ``drop[i]`` is the category in feature ``X[:, i]`` that
+            should be dropped.
+    oversample : bool; default = True,
+        - ```True``` oversamples train data
+        - ```False``` does not oversample train data
+    random_state : int; defult = None,
+        for use in ```train_test_split``` and ```SMOTENC```
+    verbose : int; default = 0, 
+        verbosity control. Larger value means more report. 
+    output : str; default = 'default',
+        output control, options == ```'default' , 'all'```
+        - 'default' returns {X_train, y_train, X_test, y_test}
+        - 'all' returns {X_train, y_train, X_test, y_test, preprocessor, nume_col, cate_col}
+    
+    Returns:
+    --------
+    --- depending on output control ---
+    X_train : pandas.core.frame.DataFrame, 
+    y_train : pandas.core.series.Series, 
+    X_test : pandas.core.frame.DataFrame, 
+    y_test : pandas.core.series.Series, 
+    preprocessor : ColumnTransformer object,
+    nume_col : list,
+    cate_col : list,
+
+    --- version 0.1 ---
+    """
     from sklearn.model_selection import train_test_split
     # isolating numerical cols
     nume_col = list(X.select_dtypes('number').columns)
@@ -651,7 +824,7 @@ def dataset_processor(X, y, train_size=.8, scaler=None,  OHE_drop_option=None, o
     if output == 'default':
         return X_train, y_train, X_test, y_test
     elif output == 'all':
-        return X_train, y_train, X_test, y_test, preprocessor
+        return X_train, y_train, X_test, y_test, preprocessor, nume_col, cate_col
 
 
 def feature_analysis_intracluster(
@@ -664,6 +837,63 @@ def feature_analysis_intracluster(
         histnorm='probability density',
         color_discrete_sequence=px.colors.qualitative.Pastel,
         template='presentation'):
+    """produces plots for use in analysis intracluster
+    Parameters follows conventional plotly express histogram options.
+
+    +++++++++++++++++
+     Helper function
+    +++++++++++++++++
+
+    Parameters:
+    -----------
+    data_frame: DataFrame or array-like or dict
+        This argument needs to be passed for column names (and not keyword
+        names) to be used. Array-like and dict are tranformed internally to a
+        pandas DataFrame. Optional: if missing, a DataFrame gets constructed
+        under the hood using the other arguments.
+    x: str or int or Series or array-like
+        Either a name of a column in `data_frame`, or a pandas Series or
+        array_like object. Values from this column or array_like are used to
+        position marks along the x axis in cartesian coordinates. If
+        `orientation` is `'h'`, these values are used as inputs to `histfunc`.
+        Either `x` or `y` can optionally be a list of column references or
+        array_likes,  in which case the data will be treated as if it were
+        'wide' rather than 'long'.
+    facet_col: str or int or Series or array-like
+        Either a name of a column in `data_frame`, or a pandas Series or
+        array_like object. Values from this column or array_like are used to
+        assign marks to facetted subplots in the horizontal direction.
+    color_discrete_sequence: list of str
+        Strings should define valid CSS-colors. When `color` is set and the
+        values in the corresponding column are not numeric, values in that
+        column are assigned colors by cycling through `color_discrete_sequence`
+        in the order described in `category_orders`, unless the value of
+        `color` is a key in `color_discrete_map`. Various useful color
+        sequences are available in the `plotly.express.colors` submodules,
+        specifically `plotly.express.colors.qualitative`.
+    marginal: str
+        One of `'rug'`, `'box'`, `'violin'`, or `'histogram'`. If set, a
+        subplot is drawn alongside the main plot, visualizing the distribution.
+    histnorm: str (default `None`)
+        One of `'percent'`, `'probability'`, `'density'`, or `'probability
+        density'` If `None`, the output of `histfunc` is used as is. If
+        `'probability'`, the output of `histfunc` for a given bin is divided by
+        the sum of the output of `histfunc` for all bins. If `'percent'`, the
+        output of `histfunc` for a given bin is divided by the sum of the
+        output of `histfunc` for all bins and multiplied by 100. If
+        `'density'`, the output of `histfunc` for a given bin is divided by the
+        size of the bin. If `'probability density'`, the output of `histfunc`
+        for a given bin is normalized such that it corresponds to the
+        probability that a random event whose distribution is described by the
+        output of `histfunc` will fall into that bin.
+    nbins: int
+        Positive integer. Sets the number of bins.
+    title: str
+        The figure title.
+    template: str or dict or plotly.graph_objects.layout.Template instance
+        The figure template name (must be a key in plotly.io.templates) or
+        definition.
+    """
     if title is None:
         if data_frame is None:
             title = f'{x.name.replace("_"," ")}'
@@ -676,6 +906,7 @@ def feature_analysis_intracluster(
         marginal=marginal,
         histnorm=histnorm,
         nbins=nbins,
+        # labels={'count':histnorm},
         color_discrete_sequence=color_discrete_sequence,
         template=template,
         title=title,
@@ -690,13 +921,59 @@ def feature_analysis_intracluster(
                      linewidth=1,
                      linecolor=color_discrete_sequence[0],
                      mirror=True)
+
+    fig.update_yaxes(title={'font': {'size': 8}, 'text': ''})
     fig.for_each_annotation(
         lambda a: a.update(text=f'Cluster: {a.text.split("=")[1]}'))
+
+    fig.update_layout(
+        # keep the original annotations and add a list of new annotations:
+        annotations=list(fig.layout.annotations) +
+        [go.layout.Annotation(x=-0.06, y=0.5, font=dict(size=12),
+                              showarrow=False,
+                              text=histnorm,
+                              textangle=-90,
+                              xref="paper",
+                              yref="paper")])
     return fig
 
 
+def save_plotly_image(fig, filename=None, ext='.png', width=1400, height=700):
+    """Saves plotly image as png in assets folder
+
+    Parameter:
+    ----------
+    fig : plotly figure object; no default, 
+    filename : str; default = None, 
+    ext : str; default = '.png', extension of the file to save. options == ``'pdf', 'png', 'jpg'``,
+    width : int; default = 1400, width in pixels, 
+    height : int: default = 700, height in pixels,
+    """
+    import plotly.io as pio
+    pio.write_image(
+        fig, f'./assets/{filename}{ext}', width=width, height=height)
+    pass
+
+
 def get_variable_name(*args):
-    """ modified from: https://stackoverflow.com/questions/32000934/python-print-a-variables-name-and-value """
+    """modified from: https://stackoverflow.com/questions/32000934/python-print-a-variables-name-and-value 
+
+    +++++++++++++++++
+     Helper function
+    +++++++++++++++++
+
+    Gets variable name for use in function (with eval()).
+
+    Parameter:
+    ----------
+    *args : vairable
+
+    Returns:
+    --------
+    str
+
+    +++ version: 0.0.1 +++
+    """
     import inspect
     import re
     frame = inspect.currentframe().f_back
