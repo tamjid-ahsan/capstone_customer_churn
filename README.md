@@ -738,6 +738,18 @@ As a rule of thumb:
 This churn prediction model can be valuable for marketers to identify clients with higher risk of churning. This is invaluable for marketers to be able to identify potential customers as well as customers who are on verge of leaving for any reason. Simply by identifying and reaching out to them can reduce customer dissatisfaction and can retain a substantial portion of them. 
 
 
+
+
+# DASHBOARD
+
+## Online
+COMING SOON
+## Local
+run `viz_dash.py` for dashboard with insight and prediction. `Dashboard_jupyter.ipynb` contains JupyterDash version for running dash inside jupyter notebook.
+
+Snapshot:
+![dash](./assets/dashboard.jpeg)
+
 # ENVIRONMENT SETUP
 
 For running this locally please follow instructions from `'./assets/req/README.md'`.
@@ -745,12 +757,13 @@ For running this locally please follow instructions from `'./assets/req/README.m
 # REPOSITORY STRUCTURE
 
 ```
+├── Dashboard_jupyter.ipynb                         # jupyter notebook used for JupyterDash
 ├── LICENSE
-├── README.md
-├── analysis.ipynb
+├── README.md                                       # top level readme
+├── analysis.ipynb                                  # jupyter notebook used for analysis
 ├── assets
-│   ├── req
-│   │   ├── README.md
+│   ├── req                                         # env files
+│   │   ├── README.md                               # env readme with instructions
 │   │   ├── env_files
 │   │   │   ├── learn-env-win.yml
 │   │   │   └── learn-env.yml
@@ -759,15 +772,14 @@ For running this locally please follow instructions from `'./assets/req/README.m
 │   │       └── requirements_pip.txt
 │   └── ...
 ├── data
-│   ├── BankChurners.csv
-│   ├── scaled_data.csv
+│   ├── BankChurners.csv                            # raw data
+│   ├── scaled_data.csv 
 │   └── unscaled_data.csv
-├── imports_and_functions
-│   ├── __init__.py
+├── imports_and_functions                           # functions used for analysis
 │   ├── experimental.py
 │   ├── functions.py
 │   └── packages.py
-├── model
+├── model                                           # saved model
 │   ├── best_model_parameters_xgb.joblib
 │   ├── cate_col.joblib
 │   ├── kmeans_segmentation_model.joblib
@@ -775,16 +787,13 @@ For running this locally please follow instructions from `'./assets/req/README.m
 │   ├── preprocessor.joblib
 │   ├── scaled_data.joblib
 │   ├── unscaled_data.joblib
+│   ├── viz_dash.py
 │   └── xgb_clf_churn_prediction_all_data.joblib
 ├── pdf_and_html
-│   ├── analysis.html
-│   ├── analysis.pdf
-│   └── presentation.pdf
-├── presentation.pdf
-└── presentation.pptx
+│   ├── analysis.html                               # notebook html
+│   ├── analysis.pdf                                # notebook pdf
+│   └── presentation.pdf                            # presentation pdf
+├── presentation.pptx                               # presentation
+└── viz_dash.py                                     # plotly dash py file
 ```
 For additional info contact [me](https://www.linkedin.com/in/tamjidahsan/)  via linkdin.
-
-# DASH
-
-COMING SOON
