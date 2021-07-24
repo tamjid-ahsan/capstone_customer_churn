@@ -6,7 +6,7 @@ By: [Tamjid Ahsan](https://www.linkedin.com/in/tamjidahsan/)
 
 As capstone project of [Flatiron Data Science Bootcamp](https://flatironschool.com/campus-and-online-data-science-bootcamp/).
 * Student pace: Full Time
-* Scheduled project review date/time: July 22, 2021, 04:00 PM [DST]
+* Scheduled project review date/time: July 22, 2021, 05:00 PM [DST]
 * Instructor name: James Irving
 
 ## ABSTRACT
@@ -16,7 +16,7 @@ Attracting new customers is no longer a good strategy for mature businesses sinc
 This analysis is combining churn prediction and customer segmentation and aims to come up with an integrated customer analytics outline for churn management. There are six components in this analysis, starting with data pre-processing, exploratory data analysis, customer segmentation, customer characteristics analytics, churn prediction, and factor analysis. This analysis is adapting OESMiN framework for data science.
 
 Customer data of a bank is used for this analysis. After preprocessing and exploratory data analysis, customer segmentation is carried out using K-means clustering. A Random Forest model is used focusing on optimizing f-1 score to validate the clustering and get feature importance. By using this model, customers are segmented into different groups, which sanctions marketers and decision makers to implement existing customer retention strategies more precisely.  Then different machine learning models are used with the preprocessed data along with the segmentation prediction from the K-means clustering model. For this type of modeling, models were optimized for precision. To address class imbalance Synthetic Minority Oversampling Technique (SMOTE) is applied to the training set. For factor analysis feature importance of models are used.
-Based on cluster characteristics, clients are labeled as `Low value frequent users of services`, `High risk clients segmentation`, `Regular clients`, `Most loyal clients`, and `High value clients`. Final model accuracy is 0.97 with good precision of predicting churn at around 0.93.
+Based on cluster characteristics, clients are labeled as `Low value frequent users of services`, `High risk clients`, `Regular clients`, `Most loyal clients`, and `High value clients`. Final model accuracy is 0.97 with good precision of predicting churn at around 0.93.
 
 
 ## OVERVIEW
@@ -757,29 +757,33 @@ For running this locally please follow instructions from `'./assets/req/README.m
 # REPOSITORY STRUCTURE
 
 ```
-├── Dashboard_jupyter.ipynb                         # jupyter notebook used for JupyterDash
 ├── LICENSE
-├── README.md                                       # top level readme
-├── analysis.ipynb                                  # jupyter notebook used for analysis
-├── assets
-│   ├── req                                         # env files
-│   │   ├── README.md                               # env readme with instructions
-│   │   ├── env_files
+├── README.md                                         # top level readme
+├── additional_notebooks
+│   ├── analysis_old.ipynb
+│   ├── analysis.html                                 # notebook html
+│   ├── analysis.pdf                                  # notebook pdf
+│   └── dashboard_using_JupyterDash.ipynb             # jupyter notebook used for JupyterDash
+├── analysis.ipynb                                    # jupyter notebook used for analysis
+├── assets                                           
+│   ├── req                                           # env readme with instructions 
+│   │   ├── README.md
+│   │   ├── env_files                                 # env files
 │   │   │   ├── learn-env-win.yml
 │   │   │   └── learn-env.yml
 │   │   └── package_and_lib
 │   │       ├── requirements_conda.txt
 │   │       └── requirements_pip.txt
 │   └── ...
-├── data
-│   ├── BankChurners.csv                            # raw data
-│   ├── scaled_data.csv 
+├── data                                              # saved model
+│   ├── BankChurners.csv                              # raw data
+│   ├── scaled_data.csv
 │   └── unscaled_data.csv
-├── imports_and_functions                           # functions used for analysis
+├── imports_and_functions
 │   ├── experimental.py
-│   ├── functions.py
+│   ├── functions.py                                  # functions used for analysis
 │   └── packages.py
-├── model                                           # saved model
+├── model
 │   ├── best_model_parameters_xgb.joblib
 │   ├── cate_col.joblib
 │   ├── kmeans_segmentation_model.joblib
@@ -789,11 +793,8 @@ For running this locally please follow instructions from `'./assets/req/README.m
 │   ├── unscaled_data.joblib
 │   ├── viz_dash.py
 │   └── xgb_clf_churn_prediction_all_data.joblib
-├── pdf_and_html
-│   ├── analysis.html                               # notebook html
-│   ├── analysis.pdf                                # notebook pdf
-│   └── presentation.pdf                            # presentation pdf
-├── presentation.pptx                               # presentation
-└── viz_dash.py                                     # plotly dash py file
+├── presentation.pdf                                      # presentation pdf
+├── presentation.pptx                                     # presentation
+└── viz_dash.py                                           # plotly dash py file
 ```
 For additional info contact [me](https://www.linkedin.com/in/tamjidahsan/)  via linkdin.
